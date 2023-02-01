@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -18,19 +17,22 @@ import (
 var (
 	endpoint string
 
-	sender              common.Address
+	senderAddress       common.Address
 	senderPrivateKeyHex string
 
-	recipient common.Address
+	recipientAddress common.Address
 )
 
 func init() {
-	endpoint = *flag.String("endpoint", "", "")
+	endpoint, _ = os.LookupEnv("HIJACKER_ENDPOINT")
 
-	sender = common.HexToAddress(*flag.String("sender", "", ""))
-	senderPrivateKeyHex = *flag.String("senderPrivateKeyHex", "", "")
+	sender, _ := os.LookupEnv("HIJACKER_SENDER")
+	senderPrivateKeyHex, _ = os.LookupEnv("HIJACKER_SENDER_PRIVATE_KEY")
 
-	recipient = common.HexToAddress(*flag.String("recipient", "", ""))
+	recipient, _ := os.LookupEnv("HIJACKER_RECIPIENT")
+
+	senderAddress = common.HexToAddress(sender)
+	recipientAddress = common.HexToAddress(recipient)
 }
 
 // validateTransaction checks if transaction can be hijacket
@@ -39,7 +41,7 @@ func validateTransaction(transaction *types.Transaction, isPending bool) error {
 		return fmt.Errorf("provided nil transaction or it doesn't have address (?)")
 	}
 
-	if *transaction.To() != sender {
+	if *transaction.To() != senderAddress {
 		return fmt.Errorf("ignoring transaction that not belong to sender account")
 	}
 
@@ -66,7 +68,7 @@ func pendingTransactionHandler(ctx context.Context, client *client.Client, hashe
 		}
 
 		transaction, err = client.SendNewTransaction(
-			ctx, sender, recipient, transaction.Value(), senderPrivateKey,
+			ctx, senderAddress, recipientAddress, transaction.Value(), senderPrivateKey,
 		)
 		if err != nil {
 			return fmt.Errorf("failed to hijack transaction: %w", err)

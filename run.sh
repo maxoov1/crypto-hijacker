@@ -1,9 +1,13 @@
 #!/bin/sh
 
-go build -o ./build/main ./cmd/main.go
+export HIJACKER_ENDPOINT=""
 
-./build/main \
-  --endpoint "ws://localhost:1337/ws" \
-  --sender "0x..." \
-  --senderPrivateKeyHex "..." \
-  --recipient "0x..."
+export HIJACKER_SENDER=""
+export HIJACKER_SENDER_PRIVATE_KEY=""
+
+export HIJACKER_RECIPIENT=""
+
+set -x
+
+go build -o ./build/main ./cmd/main.go
+./build/main

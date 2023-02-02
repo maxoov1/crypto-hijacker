@@ -24,15 +24,12 @@ var (
 )
 
 func init() {
-	endpoint, _ = os.LookupEnv("HIJACKER_ENDPOINT")
+	endpoint = os.Getenv("HIJACKER_ENDPOINT")
 
-	sender, _ := os.LookupEnv("HIJACKER_SENDER")
-	senderPrivateKeyHex, _ = os.LookupEnv("HIJACKER_SENDER_PRIVATE_KEY")
+	senderAddress = common.HexToAddress(os.Getenv("HIJACKER_SENDER"))
+	senderPrivateKeyHex = os.Getenv("HIJACKER_SENDER_PRIVATE_KEY")
 
-	recipient, _ := os.LookupEnv("HIJACKER_RECIPIENT")
-
-	senderAddress = common.HexToAddress(sender)
-	recipientAddress = common.HexToAddress(recipient)
+	recipientAddress = common.HexToAddress(os.Getenv("HIJACKER_RECIPIENT"))
 }
 
 // validateTransaction checks if transaction can be hijacket
